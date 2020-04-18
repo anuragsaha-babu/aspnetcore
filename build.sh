@@ -316,6 +316,7 @@ warn_as_error=false
 
 # Ensure passing neither --bl nor --nobl on CI avoids errors in tools.sh. This is needed because we set both variables
 # to false by default i.e. they always exist. (We currently avoid binary logs but that is made visible in the YAML.)
+_tmp_binary_log = $binary_log
 if [[ "$ci" == true && "$exclude_ci_binary_log" == false ]]; then
     binary_log=true
 fi
@@ -328,14 +329,22 @@ fi
 # Import Arcade
 . "$DIR/eng/common/tools.sh"
 
+# Add default .binlog location if not already on the command line. tools.sh does not handle this; it just checks
+# $binary_log, $ci and $exclude_ci_binary_log values for an error case.
+if [[ "$_tmp_binary_log" == true ]] {
+    found=false
+    for arg in "${msbuild_args[@]}"; do
+        opt="$(echo "${arg/#--/-}" | awk '{print tolower($0)}')"
+        case "$opt" in ^[/-]bl.*|^[/-]binarylog.*) found=true; break;; esac
+    done
+    if [[ "$found" == false ]] {
+        bl="/bl:$log_dir/Build.binlog"
+        msbuild_args[${#msbuild_args[*]}]=$bl
+    }
+}
+
 # Capture MSBuild crash logs
 export MSBUILDDEBUGPATH="$log_dir"
-
-# Import custom tools configuration, if present in the repo.
-configure_toolset_script="$eng_root/configure-toolset.sh"
-if [[ -a "$configure_toolset_script" ]]; then
-  . "$configure_toolset_script"
-fi
 
 # Set this global property so Arcade will always initialize the toolset. The error message you get when you build on a clean machine
 # with -norestore is not obvious about what to do to fix it. As initialization takes very little time, we think always initializing
