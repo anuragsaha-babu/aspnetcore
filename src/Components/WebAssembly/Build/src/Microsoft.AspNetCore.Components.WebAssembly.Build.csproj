@@ -8,6 +8,8 @@
     <IsShippingPackage>true</IsShippingPackage>
     <HasReferenceAssembly>false</HasReferenceAssembly>
     <GenerateDependencyFile>false</GenerateDependencyFile>
+
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
   </PropertyGroup>
 
   <!-- Pack settings -->
