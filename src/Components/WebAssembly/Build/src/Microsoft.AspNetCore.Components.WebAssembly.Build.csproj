@@ -8,8 +8,6 @@
     <IsShippingPackage>true</IsShippingPackage>
     <HasReferenceAssembly>false</HasReferenceAssembly>
     <GenerateDependencyFile>false</GenerateDependencyFile>
-
-    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
   </PropertyGroup>
 
   <!-- Pack settings -->
@@ -89,7 +87,8 @@
     Name="GetBrotliTools"
     BeforeTargets="Build;GenerateNuspec"
     Inputs="@(_BrotliToolPathInput)"
-    Outputs="@(_BrotliToolPathOutput)">
+    Outputs="@(_BrotliToolPathOutput)"
+    Condition="'$(DotNetBuildFromSource)' != 'true'">
     <ItemGroup>
       <_BrotliToolsPath Include="$(MSBuildThisFileDirectory)bin\$(Configuration)\tools\compression\" />
     </ItemGroup>
